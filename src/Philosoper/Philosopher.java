@@ -52,38 +52,33 @@ public  class Philosopher extends Thread {
       return philosophers[(i + 1) % n];
     }
     
+     @Override
     public void run() {
       try {
         while (true) {
           statusShow();
           
-          if(state==THINKING)
-          {
-            thinking();
-            mutex.down();
-            state = HUNGRY; 
-            
-          }
-          
-          else if(state==HUNGRY)
-          {
-            test(this);
-            mutex.up();
-            s.acquire();
-            state = EATING;
-            
-          }
-          else 
-          {
-            eating();
-            mutex.down();
-            state = THINKING;
-            
-            test(left());  
-            test(right());
-            mutex.up();
-           
-          }
+            switch (state) {
+                case THINKING:
+                    thinking();
+                    mutex.down();
+                    state = HUNGRY;
+                    break;
+                case HUNGRY:
+                    test(this);
+                    mutex.up();
+                    s.acquire();
+                    state = EATING;
+                    break;
+                default:
+                    eating();
+                    mutex.down();
+                    state = THINKING;
+                    test(left());
+                    test(right());
+                    mutex.up();
+                    break;
+            }
           
         }
       } catch(InterruptedException e) {}
